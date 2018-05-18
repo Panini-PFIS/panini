@@ -1,0 +1,15 @@
+$if null allComments
+    <p> no hay
+$else
+    <table>
+        <thead>
+            <tr>
+                <th>Lamina</th> 
+                <th>Cantidad</th>
+        <tbody>
+            $forall Entity tableLaminaid tableLamina <- allComments
+                <tr>
+                    <td>#{tableLaminaLamina tableLamina}
+                    <td>#{tableLaminaCantidad tableLamina}
+                    
+
