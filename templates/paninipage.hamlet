@@ -1,15 +1,13 @@
 $if null allComments
     <p> no hay
 $else
-    <table>
-        <thead>
-            <tr>
-                <th>Lamina</th> 
-                <th>Cantidad</th>
-        <tbody>
-            $forall Entity tableLaminaid tableLamina <- allComments
-                <tr>
-                    <td>#{tableLaminaLamina tableLamina}
-                    <td>#{tableLaminaCantidad tableLamina}
-                    
+    $forall Entity tableLaminaid tableLamina <- allComments
+        <div class="column">
+            <div class="card">
+                <img src="https://i2.wp.com/www.sopitas.com/wp-content/uploads/2017/06/mundial-rusia-2018.jpg?fit=860%2C484" alt="Avatar" style="width:100%">
+                <div class="container">
+                    <h4>Lamina: <b>#{tableLaminaLamina tableLamina}
+                    <p>Cantidad: #{tableLaminaCantidad tableLamina}
+
+
 

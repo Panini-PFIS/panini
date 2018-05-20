@@ -4,8 +4,11 @@
 User
     ident Text
     password Text Maybe
+    longitude Int
+    latitude Int
     UniqueUser ident
     deriving Typeable
+    
 Email
     email Text
     userId UserId Maybe

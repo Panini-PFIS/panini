@@ -28,19 +28,14 @@ getUserLaminaR = do
 
 
 
-$if null allComments
-    <p> no hay
-$else
-    <table>
+<table>
         <thead>
             <tr>
-                <th>Usuario</th>
                 <th>Lamina</th> 
                 <th>Cantidad</th>
         <tbody>
-            $forall Entity userLaminaid userLamina <- allComments
+            $forall Entity tableLaminaid tableLamina <- allComments
                 <tr>
-                    <td>#{show (userLaminaLamina userLamina)} 
-                    <td>#{userLaminaLamina userLamina}
-                    <td>#{userLaminaCantidad userLamina}
+                    <td>#{tableLaminaLamina tableLamina}
+                    <td>#{tableLaminaCantidad tableLamina}
 -}
