@@ -29,14 +29,6 @@ getUserLaminaR = do
         $(widgetFile "paninipage")
             where s = "SELECT ?? FROM (SELECT lamina as id,lamina as lamina, CAST(SUM(cantidad) as int8) as cantidad FROM user_lamina GROUP BY lamina) table_lamina ORDER BY lamina"
 
-getSignInR :: Handler Html
-getSignInR = do
-    allComments <- runDB $ rawSql s []
-    defaultLayout $ do
-        setTitle "Welcome To Yesod!"
-        $(widgetFile "paninipage")
-        where s = "SELECT ?? FROM (SELECT lamina as id,lamina as lamina, CAST(SUM(cantidad) as int8) as cantidad FROM user_lamina GROUP BY lamina) table_lamina ORDER BY lamina"
-
 getSignUpR :: Handler Html
 getSignUpR = do
     (userWidget, enctype) <- generateFormPost signUpForm

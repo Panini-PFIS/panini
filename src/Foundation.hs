@@ -7,6 +7,9 @@
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE FlexibleContexts #-}
+
 
 module Foundation where
 
@@ -18,6 +21,8 @@ import Control.Monad.Logger (LogSource)
 
 -- Used only when in "auth-dummy-login" setting is enabled.
 import Yesod.Auth.Dummy
+
+
 
 import Yesod.Auth.OpenId    (authOpenId, IdentifierType (Claimed))
 import Yesod.Default.Util   (addStaticContentExternal)
@@ -112,7 +117,7 @@ instance Yesod App where
         let menuItems =
                 [ NavbarLeft $ MenuItem
                     { menuItemLabel = "Home"
-                    , menuItemRoute = HomeR
+                    , menuItemRoute = UserLaminaR
                     , menuItemAccessCallback = True
                     }
                 , NavbarLeft $ MenuItem
@@ -124,11 +129,6 @@ instance Yesod App where
                 , NavbarRight $ MenuItem
                     { menuItemLabel = "Log in"
                     , menuItemRoute = AuthR LoginR
-                    , menuItemAccessCallback = isNothing muser
-                    }
-                , NavbarRight $ MenuItem
-                    { menuItemLabel = "Sign in"
-                    , menuItemRoute = SignInR
                     , menuItemAccessCallback = isNothing muser
                     }
                 , NavbarRight $ MenuItem
@@ -174,7 +174,6 @@ instance Yesod App where
     isAuthorized (AuthR _) _ = return Authorized
     isAuthorized UserLaminaR _ = return Authorized
     isAuthorized SignUpR _ = return Authorized
-    isAuthorized SignInR _ = return Authorized
     isAuthorized CommentR _ = return Authorized
     isAuthorized HomeR _ = return Authorized
     isAuthorized FaviconR _ = return Authorized
@@ -251,10 +250,10 @@ instance YesodAuth App where
 
     -- Where to send a user after successful login
     loginDest :: App -> Route App
-    loginDest _ = HomeR
+    loginDest _ = UserLaminaR
     -- Where to send a user after logout
     logoutDest :: App -> Route App
-    logoutDest _ = HomeR
+    logoutDest _ = UserLaminaR
     -- Override the above two destinations when a Referer: header is present
     redirectToReferer :: App -> Bool
     redirectToReferer _ = True
@@ -265,20 +264,14 @@ instance YesodAuth App where
         x <- getBy $ UniqueUser $ credsIdent creds
         case x of
             Just (Entity uid _) -> return $ Authenticated uid
-            Nothing -> Authenticated <$> insert User
-                { userIdent = credsIdent creds
-                , userPassword = Nothing
-                , userLongitude = 0
-                , userLatitude = 0
-                }
+            
 
     -- You can add other plugins like Google Email, email or OAuth here
     authPlugins :: App -> [AuthPlugin App]
     authPlugins app = [authOpenId Claimed []] ++ extraAuthPlugins
         -- Enable authDummy login if enabled.
-        where extraAuthPlugins = [authDummy | appAuthDummyLogin $ appSettings app]
+        where extraAuthPlugins = [authOwn]
 
--- | Access function to determine if a user is logged in.
 isAuthenticated :: Handler AuthResult
 isAuthenticated = do
     muid <- maybeAuthId
@@ -303,6 +296,32 @@ instance HasHttpManager App where
 
 unsafeHandler :: App -> Handler a -> IO a
 unsafeHandler = Unsafe.fakeHandlerGetLogger appLogger
+
+
+--testing auth
+
+authOwn :: YesodAuth m => AuthPlugin m
+authOwn =
+    AuthPlugin "dummy" dispatch login
+  where
+    dispatch "POST" [] = do
+        ident <- runInputPost $ ireq textField "ident"
+        password <- runInputPost $ ireq passwordField "password"
+        setCredsRedirect $ Creds "dummy" ident []--(Creds [("ident",ident),("password" password)]) []
+    dispatch _ _ = notFound
+    url = PluginR "dummy" []
+    login authToMaster = do
+        request <- getRequest
+        toWidget [hamlet|
+<form method="post" action="@{authToMaster url}">
+    Your username: #
+    <input type="text" name="ident">
+    <br>
+    Your password: #
+    <input type="password" name="password">
+    <br>
+    <input type="submit" value="Panini login">
+|]
 
 -- Note: Some functionality previously present in the scaffolding has been
 -- moved to documentation in the Wiki. Following are some hopefully helpful

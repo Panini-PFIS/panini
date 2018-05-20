@@ -9,8 +9,6 @@
 
 / UserLaminaR GET
 
-/signIn SignInR GET
-
 /signUp SignUpR GET POST
 
 /home HomeR GET POST
