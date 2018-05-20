@@ -4,8 +4,8 @@
 User
     ident Text
     password Text Maybe
-    longitude Int
-    latitude Int
+    longitude Double
+    latitude Double
     UniqueUser ident
     deriving Typeable
     

@@ -7,8 +7,11 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
-
 / UserLaminaR GET
+
+/signIn SignInR GET
+
+/signUp SignUpR GET POST
 
 /home HomeR GET POST
 

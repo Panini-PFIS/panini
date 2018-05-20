@@ -120,9 +120,20 @@ instance Yesod App where
                     , menuItemRoute = ProfileR
                     , menuItemAccessCallback = isJust muser
                     }
+                    
                 , NavbarRight $ MenuItem
-                    { menuItemLabel = "Login"
+                    { menuItemLabel = "Log in"
                     , menuItemRoute = AuthR LoginR
+                    , menuItemAccessCallback = isNothing muser
+                    }
+                , NavbarRight $ MenuItem
+                    { menuItemLabel = "Sign in"
+                    , menuItemRoute = SignInR
+                    , menuItemAccessCallback = isNothing muser
+                    }
+                , NavbarRight $ MenuItem
+                    { menuItemLabel = "Sign up"
+                    , menuItemRoute = SignUpR
                     , menuItemAccessCallback = isNothing muser
                     }
                 , NavbarRight $ MenuItem
@@ -162,6 +173,8 @@ instance Yesod App where
     -- Routes not requiring authentication.
     isAuthorized (AuthR _) _ = return Authorized
     isAuthorized UserLaminaR _ = return Authorized
+    isAuthorized SignUpR _ = return Authorized
+    isAuthorized SignInR _ = return Authorized
     isAuthorized CommentR _ = return Authorized
     isAuthorized HomeR _ = return Authorized
     isAuthorized FaviconR _ = return Authorized
