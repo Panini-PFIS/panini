@@ -16,3 +16,5 @@
 /comments CommentR POST
 
 /profile ProfileR GET
+
+/exchange ExchangeR GET POST

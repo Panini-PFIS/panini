@@ -23,13 +23,14 @@ import Control.Monad.Logger (LogSource)
 import Yesod.Auth.Dummy
 
 
-
 import Yesod.Auth.OpenId    (authOpenId, IdentifierType (Claimed))
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding as TE
+
+mkMessage "App" "messages" "es"
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -179,6 +180,7 @@ instance Yesod App where
     isAuthorized FaviconR _ = return Authorized
     isAuthorized RobotsR _ = return Authorized
     isAuthorized (StaticR _) _ = return Authorized
+    isAuthorized ExchangeR _ = return Authorized
 
     -- the profile route requires that the user is authenticated, so we
     -- delegate to that function

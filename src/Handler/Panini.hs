@@ -49,3 +49,20 @@ postSignUpR = do
             $(widgetFile "signuppage")
 
 
+exchangeForm :: UserId -> UserId -> Form Intercambio
+exchangeForm user1 user2 = renderBootstrap3 BootstrapBasicForm $ Intercambio
+        <$> pure user1
+        <*> pure user2
+        <*> areq intField (bfs MsgLamina1) Nothing
+        <*> areq intField (bfs MsgLamina2) Nothing
+        <*> lift (liftIO getCurrentTime)
+
+getExchangeR :: Handler Html
+getExchangeR = do
+    exchanges <- runDB $ selectList [] [Desc IntercambioFecha]
+    defaultLayout $ do
+        setTitle "Card Exchange"
+        $(widgetFile "exchangepage")
+
+postExchangeR :: Handler Html
+postExchangeR = error "not implemented"

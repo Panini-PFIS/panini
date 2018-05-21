@@ -31,6 +31,7 @@ Intercambio
     lamina1 Int
     lamina2 Int
     fecha UTCTime
+    deriving Show
 -- Not part of the model
 TableLamina
     lamina Int
