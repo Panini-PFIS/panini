@@ -60,11 +60,13 @@ exchangeForm user1 user2 = renderBootstrap3 BootstrapBasicForm $ Intercambio
 
 getExchangeR :: Handler Html
 getExchangeR = do
-    exchanges <- runDB $ rawSql s []
+    exchanges <- runDB $ getExchangeQuery
     defaultLayout $ do
         setTitleI $ MsgExchangeTitle
         $(widgetFile "exchangepage")
-            where s = "select ??, ?? FROM intercambio, \"user\" where intercambio.user1 = \"user\".id"
 
+getExchangeQuery :: MonadIO m => ReaderT SqlBackend m [(Entity Intercambio, Single Text, Single Text)]
+getExchangeQuery = rawSql s []
+                        where s = "select ??,\"user\".ident,us.ident from intercambio left join \"user\" on intercambio.user1 = \"user\".id left join \"user\" as us on intercambio.user2 = us.id";
 postExchangeR :: Handler Html
 postExchangeR = error "not implemented"
