@@ -1,10 +1,16 @@
 <div .ui.container>
 
-    <h1>
-      Access granted!
-
-    <p>
-      This page is protected and access is allowed only for authenticated users.
-
-    <p>
-      Your data is protected with us <strong><span class="username">#{userIdent user}</span></strong>!
+  <h1>Hi: <strong><span class="username">#{userIdent user}</span></strong>!
+  <br>
+  <! <form method=post enctype=#{enctype}>
+  <!    ^{newLaminaWidget}
+  <!    <div>
+  <!         <input type=submit value=Agregar lamina>
+  <h2> Tus laminas son las siguientes:
+  $forall (Single lamina, Single cantidad) <- userLaminas
+    <div class="column">
+      <div class="card">
+        <img src="https://i2.wp.com/www.sopitas.com/wp-content/uploads/2017/06/mundial-rusia-2018.jpg?fit=860%2C484" alt="Avatar" style="width:100%">
+        <div class="container">
+          <h4>Lamina: <b>#{show lamina}
+          <p>Cantidad: #{show cantidad}
