@@ -17,4 +17,4 @@
 
 /profile ProfileR GET
 
-/exchange ExchangeR GET POST
+/exchange/#UserId/#UserId ExchangeR GET POST

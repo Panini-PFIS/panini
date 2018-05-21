@@ -1,13 +1,14 @@
 $if null allComments
     <p> no hay
 $else
-    $forall Entity tableLaminaid tableLamina <- allComments
+<!    $forall Entity tableLaminaid tableLamina <- allComments>
+    $forall (Single lamina, Single cantidad) <- allComments
         <div class="column">
             <div class="card">
                 <img src="https://i2.wp.com/www.sopitas.com/wp-content/uploads/2017/06/mundial-rusia-2018.jpg?fit=860%2C484" alt="Avatar" style="width:100%">
                 <div class="container">
-                    <h4>Lamina: <b>#{tableLaminaLamina tableLamina}
-                    <p>Cantidad: #{tableLaminaCantidad tableLamina}
+                    <h4>Lamina: <b>#{show lamina}
+                    <p>Cantidad: #{show cantidad}
                     $case user
                         $of Nothing
                             <button type="button" disabled>Make an interchange

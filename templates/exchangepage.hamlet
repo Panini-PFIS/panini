@@ -2,5 +2,5 @@ $if null exchanges
     <p> No se ha hecho ningun intercambio en la plataforma
 $else
     $forall (Entity _ intercambio, Single user1, Single user2) <- exchanges
-        <p>#{user1} -- #{user2} -- #{intercambioLamina1 intercambio} -- #{intercambioLamina2 intercambio}
+        <p>#{user1} -- #{user2} -- #{intercambioLamina1 intercambio} -- #{intercambioLamina2 intercambio} -- #{show $ intercambioFecha intercambio}
         <br>
