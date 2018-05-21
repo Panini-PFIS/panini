@@ -59,16 +59,12 @@ exchangeForm user1 user2 = renderBootstrap3 BootstrapBasicForm $ Intercambio
         <*> lift (liftIO getCurrentTime)
 
 getExchangeR :: Handler Html
-getExchangeR = error "not impl"
-{-getExchangeR = do
-    exchanges <- runDB $ rawSql
-        "select (Entity Intercambio), (Entity User) \
-        \FROM ((intercambio left join user on intercambio.user1 == user.id)"
-        []
-
+getExchangeR = do
+    exchanges <- runDB $ rawSql s []
     defaultLayout $ do
         setTitleI $ MsgExchangeTitle
         $(widgetFile "exchangepage")
--}
+            where s = "select ??, ?? FROM intercambio, \"user\" where intercambio.user1 = \"user\".id"
+
 postExchangeR :: Handler Html
 postExchangeR = error "not implemented"
