@@ -8,6 +8,12 @@ $else
                 <div class="container">
                     <h4>Lamina: <b>#{tableLaminaLamina tableLamina}
                     <p>Cantidad: #{tableLaminaCantidad tableLamina}
+                    $case user
+                        $of Nothing
+                            <button type="button" disabled>Make an interchange
+                        $of _
+                            <button type="button">Make an interchange
+                        
 
 
 
