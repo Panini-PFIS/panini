@@ -3,6 +3,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE QuasiQuotes, TypeFamilies, GeneralizedNewtypeDeriving, TemplateHaskell, OverloadedStrings, FlexibleContexts, GADTs  #-}
 module Handler.Panini where
 
@@ -44,7 +45,7 @@ postSignUpR = do
             entryId <- runDB $ insert user
             redirect $ UserLaminaR
         _ -> defaultLayout $ do
-            setMessage $ "Please, correct de form"
+            setMessage $ "Please, correct the form"
             $(widgetFile "signuppage")
 
 
@@ -57,11 +58,16 @@ exchangeForm user1 user2 = renderBootstrap3 BootstrapBasicForm $ Intercambio
         <*> lift (liftIO getCurrentTime)
 
 getExchangeR :: Handler Html
-getExchangeR = do
-    exchanges <- runDB $ selectList [] [Desc IntercambioFecha]
-    defaultLayout $ do
-        setTitle "Card Exchange"
-        $(widgetFile "exchangepage")
+getExchangeR = error "not impl"
+{-getExchangeR = do
+    exchanges <- runDB $ rawSql
+        "select (Entity Intercambio), (Entity User) \
+        \FROM ((intercambio left join user on intercambio.user1 == user.id)"
+        []
 
+    defaultLayout $ do
+        setTitleI $ MsgExchangeTitle
+        $(widgetFile "exchangepage")
+-}
 postExchangeR :: Handler Html
 postExchangeR = error "not implemented"
