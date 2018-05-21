@@ -23,6 +23,7 @@ signUpForm = renderBootstrap3 BootstrapBasicForm $ User
 
 getUserLaminaR :: Handler Html
 getUserLaminaR = do
+    user <- maybeAuth 
     allComments <- runDB $ rawSql s []
     defaultLayout $ do
         setTitle "Welcome To Yesod!"
