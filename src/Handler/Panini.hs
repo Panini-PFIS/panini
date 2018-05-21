@@ -48,3 +48,8 @@ postSignUpR = do
             $(widgetFile "signuppage")
 
 
+getExchangeR :: Handler Html
+getExchangeR = error "not implemented"
+
+postExchangeR :: Handler Html
+postExchangeR = error "not implemented"
