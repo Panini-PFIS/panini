@@ -6,7 +6,7 @@
       ^{newLaminaWidget}
       <div>
            <input type=submit value=Agregar lamina>
-  <h2> Tus laminas son las siguientes:
+  <h2> Tus laminas son las siguientes
   $forall (Single lamina, Single cantidad) <- userLaminas
     <div class="column">
       <div class="card">
@@ -14,3 +14,5 @@
         <div class="container">
           <h4>Lamina: <b>#{show lamina}
           <p>Cantidad: #{show cantidad}
+          <a href=@{CantidadR lamina cantidad}>Change
+

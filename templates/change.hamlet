@@ -1,0 +1,4 @@
+<h1> Change:
+<p>Lamina: #{lamina}
+<input type="text" name="cantidad" value="#{cantidad}"><br>
+<a href=@{CantidadCambiadaR lamina cantidad}>Cambiar

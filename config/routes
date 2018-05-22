@@ -20,3 +20,8 @@
 /exchange/#UserId/#UserId/#Int ExchangeR GET POST
 
 /lamina/#Int LaminaR GET
+
+
+/change/#Int/#Int CantidadR GET
+
+/changeTotal/#Int/#Int CantidadCambiadaR GET
