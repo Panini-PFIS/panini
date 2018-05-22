@@ -2,10 +2,10 @@
 
   <h1>Hi: <strong><span class="username">#{userIdent user}</span></strong>!
   <br>
-  <! <form method=post enctype=#{enctype}>
-  <!    ^{newLaminaWidget}
-  <!    <div>
-  <!         <input type=submit value=Agregar lamina>
+   <form method=post enctype=#{enctype}>
+      ^{newLaminaWidget}
+      <div>
+           <input type=submit value=Agregar lamina>
   <h2> Tus laminas son las siguientes:
   $forall (Single lamina, Single cantidad) <- userLaminas
     <div class="column">

@@ -15,7 +15,7 @@
 
 /comments CommentR POST
 
-/profile ProfileR GET
+/profile ProfileR GET POST
 
 /exchange/#UserId/#UserId/#Int ExchangeR GET POST
 

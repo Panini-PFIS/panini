@@ -22,12 +22,32 @@ formNewLamina userId = renderBootstrap3 BootstrapBasicForm $ UserLamina
 getProfileR :: Handler Html
 getProfileR = do
     (_, user) <- requireAuthPair
-    --idUserArray <- runDB $ (getUserId (userIdent user))
+    idUserArray <- runDB $ (getUserId (userIdent user))
+    idUser <- getHeadArray idUserArray
     userLaminas <- runDB $ (getUserLaminasQuery (userIdent user))
-    --(newLaminaWidget, enctype) <- generateFormPost (formNewLamina (head idUserArray))
+    (newLaminaWidget, enctype) <- generateFormPost (formNewLamina idUser)
     defaultLayout $ do
         setTitle . toHtml $ userIdent user <> "'s User page"
         $(widgetFile "profile")
+
+postProfileR :: Handler Html
+postProfileR = do
+    (_, user) <- requireAuthPair
+    idUserArray <- runDB $ (getUserId (userIdent user))
+    idUser <- getHeadArray idUserArray
+    userLaminas <- runDB $ (getUserLaminasQuery (userIdent user))
+    ((res,newLaminaWidget), enctype) <- runFormPost (formNewLamina idUser)
+    case res of
+        FormSuccess userLamina  -> do
+            runDB $ insert userLamina
+            redirect $ ProfileR
+        _ -> defaultLayout $ do
+            setMessage $ "Please, correct the form"
+            $(widgetFile "profile")
+
+
+getHeadArray :: [UserId] -> HandlerFor App UserId
+getHeadArray (x:_)= return x 
 
 getUserId :: MonadIO m => Text ->  ReaderT SqlBackend m [UserId]
 getUserId user = rawSql s []
