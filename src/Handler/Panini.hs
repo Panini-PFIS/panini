@@ -52,20 +52,22 @@ postSignUpR = do
             setMessage $ "Please, correct the form"
             $(widgetFile "signuppage")
 
-exchangeForm :: UserId -> UserId -> Form Intercambio
-exchangeForm user1 user2 = renderBootstrap3 BootstrapBasicForm $ Intercambio
+exchangeForm :: UserId -> UserId -> Int -> Form Intercambio
+exchangeForm user1 user2 lamina2 = renderBootstrap3 BootstrapBasicForm $ Intercambio
         <$> pure user1
         <*> pure user2
         <*> areq intField (bfs MsgLamina1) Nothing
-        <*> areq intField (bfs MsgLamina2) Nothing
+        <*> pure lamina2
+        <*> areq intField "Cantidad: " Nothing
         <*> lift (liftIO getCurrentTime)
 
-getExchangeR :: UserId -> UserId -> Handler Html
-getExchangeR _ _ = do
+getExchangeR :: UserId -> UserId -> Int -> Handler Html
+getExchangeR user1 user2 lamina = do
+    (exchangeWidget, enctype) <- generateFormPost (exchangeForm user1 user2 lamina)
     exchanges <- runDB $ getExchangeQuery
     defaultLayout $ do
         setTitleI $ MsgExchangeTitle
-        $(widgetFile "exchangepage")
+        $(widgetFile "exchangeform")
 
 getExchangeQuery :: MonadIO m => ReaderT SqlBackend m [(Entity Intercambio, Single Text, Single Text)]
 getExchangeQuery = rawSql s []
@@ -73,9 +75,9 @@ getExchangeQuery = rawSql s []
                                   \from intercambio left join \"user\" on intercambio.user1 = \"user\".id \
                                   \left join \"user\" as us on intercambio.user2 = us.id"
 
-postExchangeR :: UserId -> UserId -> Handler Html
-postExchangeR user1 user2 = do
-    ((res,exchangeWidget), enctype) <- runFormPost (exchangeForm user1 user2)
+postExchangeR :: UserId -> UserId -> Int -> Handler Html
+postExchangeR user1 user2 lamina = do
+    ((res,exchangeWidget), enctype) <- runFormPost (exchangeForm user1 user2 lamina)
     case res of
         FormSuccess exchange -> do
             _ <- runDB $ insert exchange

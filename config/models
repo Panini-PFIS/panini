@@ -30,9 +30,6 @@ Intercambio
     user2 UserId
     lamina1 Int
     lamina2 Int
+    cantidad Int
     fecha UTCTime
     deriving Show
--- Not part of the model
-TableLamina
-    lamina Int
-    cantidad Int

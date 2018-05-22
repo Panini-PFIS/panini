@@ -10,5 +10,5 @@ $else
                     <p>Cantidad: #{show cantidad}
                     $case useractual
                         $of Just ua
-                            <a href=@{ExchangeR (entityKey $ ua) userId}>Exchange
+                            <a href=@{ExchangeR (entityKey $ ua) userId lamina}>Exchange
                         $of _
