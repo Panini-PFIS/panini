@@ -83,3 +83,15 @@ postExchangeR user1 user2 = do
         _ -> defaultLayout $ do
             setMessageI $ MsgUnsuccessfulExchange
             $(widgetFile "exchangeform")
+
+getLaminaR :: Int -> Handler Html
+getLaminaR lamina = do
+    useractual <- maybeAuth 
+    laminas <- runDB $ getLaminaUsuariosQuery $ lamina
+    defaultLayout $ do
+        setTitleI $ MsgExchangeTitle
+        $(widgetFile "laminaseleccionadausuarios")
+
+getLaminaUsuariosQuery :: MonadIO m => Int -> (ReaderT SqlBackend m [(Entity User, Single Int)])
+getLaminaUsuariosQuery lamina = rawSql s []
+                        where s = pack $ "select ??,cantidad from user_lamina left join \"user\" on user_lamina.user = \"user\".id where lamina = " ++ (show lamina)

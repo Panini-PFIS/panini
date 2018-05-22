@@ -18,3 +18,5 @@
 /profile ProfileR GET
 
 /exchange/#UserId/#UserId ExchangeR GET POST
+
+/lamina/#Int LaminaR GET

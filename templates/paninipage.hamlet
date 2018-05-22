@@ -11,10 +11,6 @@ $else
                     <p>Cantidad: #{show cantidad}
                     $case user
                         $of Nothing
-                            <button type="button" disabled>Make an interchange
+                           <a>
                         $of _
-                            <button type="button">Make an interchange
-                        
-
-
-
+                           <a href=@{LaminaR lamina}>See

@@ -1,0 +1,14 @@
+$if null laminas
+    <p>No hay laminas disponibles para intercambio
+$else
+    $forall (Entity userId user, Single cantidad) <- laminas
+        <div class="column">
+            <div class="card">
+                <img src="https://i2.wp.com/www.sopitas.com/wp-content/uploads/2017/06/mundial-rusia-2018.jpg?fit=860%2C484" alt="Avatar" style="width:100%">
+                <div class="container">
+                    <h4>Usuario: <b>#{show $ userIdent user}
+                    <p>Cantidad: #{show cantidad}
+                    $case useractual
+                        $of Just ua
+                            <a href=@{ExchangeR (entityKey $ ua) userId}>Exchange
+                        $of _
