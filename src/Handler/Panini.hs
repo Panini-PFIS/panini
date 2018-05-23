@@ -78,43 +78,28 @@ getExchangeQuery = rawSql s []
                                   \from intercambio left join \"user\" on intercambio.user1 = \"user\".id \
                                   \left join \"user\" as us on intercambio.user2 = us.id"
 
+strace s x = trace (s ++ ": "++show x) x 
+
 postExchangeR :: UserId -> UserId -> Int -> Handler Html
-postExchangeR user1 user2 lamina = do
-    ((res,exchangeWidget), enctype) <- runFormPost (exchangeForm user1 user2 lamina)
+postExchangeR user1 user2 l2 = do
+    ((res,exchangeWidget), enctype) <- runFormPost (exchangeForm user1 user2 (strace "lamina" $ l2))
     case res of
         FormSuccess exchange -> do
             _ <- runDB $ do
-                let l2 = intercambioLamina2 exchange
+                let lamina = strace "lamina1" $ intercambioLamina1 exchange
                 let c = intercambioCantidad exchange
-                c1 <- getCantidad user1 lamina
-                updateWhere [UserLaminaUser ==. user1, UserLaminaLamina ==. lamina] [UserLaminaCantidad =. getSInt(c1) - c]
-                c2 <- getCantidad user2 l2
-                updateWhere [UserLaminaUser ==. user2, UserLaminaLamina ==. l2] [UserLaminaCantidad =. getSInt(c2) - c]
+                updateWhere [UserLaminaUser ==. user1, UserLaminaLamina ==. lamina] [UserLaminaCantidad -=. c]
+                updateWhere [UserLaminaUser ==. user2, UserLaminaLamina ==. l2] [UserLaminaCantidad -=. c]
                 ans <- getBy $ UniqueUserLamina user1 l2
                 _ <- case ans of
-                    Nothing -> do 
-                            _ <- insert $ UserLamina user1 l2 c
-                            ans2 <- getBy $ UniqueUserLamina user2 lamina
-                            case ans2 of
-                                Nothing -> insert $ UserLamina user2 lamina c
-                                _ -> do
-                                        c3 <- getCantidad user2 lamina
-                                        updateWhere [UserLaminaUser ==. user2, UserLaminaLamina ==. lamina] [UserLaminaCantidad =. getSInt(c3) + c]
-                                        deleteWhere [UserLaminaCantidad <=. 0]
-                                        return $ toSqlKey 0
-                    _ -> do
-                            c4 <- getCantidad user1 l2
-                            updateWhere [UserLaminaUser ==. user1, UserLaminaLamina ==. l2] [UserLaminaCantidad =. getSInt(c4) + c]
-                            ans2 <- getBy $ UniqueUserLamina user2 lamina
-                            case ans2 of
-                                Nothing -> insert $ UserLamina user2 lamina c
-                                _ -> do
-                                        c5 <- getCantidad user2 lamina
-                                        updateWhere [UserLaminaUser ==. user2, UserLaminaLamina ==. lamina] [UserLaminaCantidad =. getSInt(c5) + c]
-                                        deleteWhere [UserLaminaCantidad <=. 0]
-                                        return $ toSqlKey 0
-                
+                    Nothing -> (insert $ UserLamina user1 l2 c) >> return ()
+                    _ -> updateWhere [UserLaminaUser ==. user1, UserLaminaLamina ==. l2] [UserLaminaCantidad +=. c]
+                ans' <- getBy $ UniqueUserLamina user2 lamina
+                _ <- case ans' of
+                    Nothing -> (insert $ UserLamina user2 lamina c) >> return ()
+                    _ -> updateWhere [UserLaminaUser ==. user2, UserLaminaLamina ==. lamina] [UserLaminaCantidad +=. c]
                 insert $ exchange
+                deleteWhere [UserLaminaCantidad <=. 0]
             redirect UserLaminaR
         _ -> defaultLayout $ do
             setMessageI $ MsgUnsuccessfulExchange
