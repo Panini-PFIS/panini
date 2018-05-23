@@ -22,6 +22,4 @@
 /lamina/#Int LaminaR GET
 
 
-/change/#Int/#Int CantidadR GET
-
-/changeTotal/#Int/#Int CantidadCambiadaR GET
+/change/#Int/#Int CantidadR GET POST

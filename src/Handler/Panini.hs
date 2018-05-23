@@ -86,26 +86,47 @@ postExchangeR user1 user2 lamina = do
             _ <- runDB $ do
                 let l2 = intercambioLamina2 exchange
                 let c = intercambioCantidad exchange
-                updateWhere [UserLaminaUser ==. user1, UserLaminaLamina ==. lamina] [UserLaminaCantidad -=. c]
-                updateWhere [UserLaminaUser ==. user2, UserLaminaLamina ==. l2] [UserLaminaCantidad -=. c]
+                c1 <- getCantidad user1 lamina
+                updateWhere [UserLaminaUser ==. user1, UserLaminaLamina ==. lamina] [UserLaminaCantidad =. getSInt(c1) - c]
+                c2 <- getCantidad user2 l2
+                updateWhere [UserLaminaUser ==. user2, UserLaminaLamina ==. l2] [UserLaminaCantidad =. getSInt(c2) - c]
                 ans <- getBy $ UniqueUserLamina user1 l2
                 _ <- case ans of
-                    Nothing -> insert $ UserLamina user1 l2 c
+                    Nothing -> do 
+                            _ <- insert $ UserLamina user1 l2 c
+                            ans2 <- getBy $ UniqueUserLamina user2 lamina
+                            case ans2 of
+                                Nothing -> insert $ UserLamina user2 lamina c
+                                _ -> do
+                                        c3 <- getCantidad user2 lamina
+                                        updateWhere [UserLaminaUser ==. user2, UserLaminaLamina ==. lamina] [UserLaminaCantidad =. getSInt(c3) + c]
+                                        deleteWhere [UserLaminaCantidad <=. 0]
+                                        return $ toSqlKey 0
                     _ -> do
-                            updateWhere [UserLaminaUser ==. user1, UserLaminaLamina ==. l2] [UserLaminaCantidad +=. c]
-                            return $ toSqlKey 0
-                ans2 <- getBy $ UniqueUserLamina user2 lamina
-                _ <- case ans2 of
-                    Nothing -> insert $ UserLamina user2 lamina c
-                    _ -> do
-                            updateWhere [UserLaminaUser ==. user2, UserLaminaLamina ==. lamina] [UserLaminaCantidad +=. c]
-                            return $ toSqlKey 0
-                deleteWhere [UserLaminaCantidad <=. 0]
+                            c4 <- getCantidad user1 l2
+                            updateWhere [UserLaminaUser ==. user1, UserLaminaLamina ==. l2] [UserLaminaCantidad =. getSInt(c4) + c]
+                            ans2 <- getBy $ UniqueUserLamina user2 lamina
+                            case ans2 of
+                                Nothing -> insert $ UserLamina user2 lamina c
+                                _ -> do
+                                        c5 <- getCantidad user2 lamina
+                                        updateWhere [UserLaminaUser ==. user2, UserLaminaLamina ==. lamina] [UserLaminaCantidad =. getSInt(c5) + c]
+                                        deleteWhere [UserLaminaCantidad <=. 0]
+                                        return $ toSqlKey 0
+                
                 insert $ exchange
             redirect UserLaminaR
         _ -> defaultLayout $ do
             setMessageI $ MsgUnsuccessfulExchange
             $(widgetFile "exchangeform")
+
+getCantidad :: MonadIO m => UserId -> Int -> (ReaderT SqlBackend m [Single Int])
+getCantidad user lamina = rawSql s []
+                        where s = pack $ "select cantidad from user_lamina where user_lamina.lamina = " ++ (show lamina) ++ "and user_lamina.user = " ++ (show $ (fromSqlKey $ user))
+
+getSInt :: [Single Int] -> Int
+getSInt ((Single x):_) = x
+getSInt _ = 0
 
 getLaminaR :: Int -> Handler Html
 getLaminaR lamina = do
@@ -117,4 +138,4 @@ getLaminaR lamina = do
 
 getLaminaUsuariosQuery :: MonadIO m => Int -> (ReaderT SqlBackend m [(Entity User, Single Int)])
 getLaminaUsuariosQuery lamina = rawSql s []
-                        where s = pack $ "select ??,cantidad from user_lamina left join \"user\" on user_lamina.user = \"user\".id where lamina = " ++ (show lamina)
+                        where s = pack $ "select ??,cantidad from user_lamina left join \"user\" on user_lamina.user = \"user\".id where lamina = " ++ (show lamina) ++ "and \"user\".latitude <= latitude + 5 and \"user\".latitude >= latitude - 5 and \"user\".longitude <= longitude + 5 and \"user\".longitude >= longitude - 5"

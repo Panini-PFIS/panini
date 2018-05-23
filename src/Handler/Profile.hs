@@ -18,6 +18,12 @@ formNewLamina userId = renderBootstrap3 BootstrapBasicForm $ UserLamina
           <*> areq intField "Lamina: " Nothing
           <*> areq intField "Cantidad: " Nothing
 
+formChangeLamina :: UserId -> Int -> Form UserLamina
+formChangeLamina userId lamina = renderBootstrap3 BootstrapBasicForm $ UserLamina
+          <$> pure  userId
+          <*> pure  lamina
+          <*> areq intField "Cantidad: " Nothing
+
 
 getProfileR :: Handler Html
 getProfileR = do
@@ -58,19 +64,27 @@ getUserLaminasQuery user = rawSql s []
 
 getCantidadR :: Int -> Int -> Handler Html
 getCantidadR lamina cantidad = do
+    (_, user) <- requireAuthPair
+    idUserArray <- runDB $ (getUserId (userIdent user))
+    idUser <- getHeadArray idUserArray
+    (newChangeLaminaWidget, enctype) <- generateFormPost (formChangeLamina idUser lamina)
     defaultLayout $ do
         setTitle  $ "Change lamina"
         $(widgetFile "change")
 
-getCantidadCambiadaR :: Int -> Int -> Handler Html
-getCantidadCambiadaR lamina cantidad= do
+postCantidadR :: Int -> Int -> Handler Html
+postCantidadR lamina cantidad= do
     (_, user) <- requireAuthPair
     idUserArray <- runDB $ (getUserId (userIdent user))
     idUser <- getHeadArray idUserArray
     userLaminas <- runDB $ (getUserLaminasQuery (userIdent user))
-    defaultLayout $ do
-        setTitle  $ "Change lamina total"
-        $(widgetFile "changeTotal")
-    --runDB $ update (UniqueUserLamina idUser lamina) [cantidad =. userLamina $ cantidad]
-    --redirect $ ProfileR    
+    ((res,newChangeLaminaWidget), enctype) <- runFormPost (formChangeLamina idUser lamina)
+    case res of
+        FormSuccess userLamina  -> do
+            runDB $ updateWhere [UserLaminaUser ==. idUser, UserLaminaLamina ==. lamina] [UserLaminaCantidad =. (userLaminaCantidad userLamina)]
+            redirect $ ProfileR
+        _ -> defaultLayout $ do
+            setMessage $ "Please, correct the form"
+            $(widgetFile "change")
+
     

@@ -1,4 +1,5 @@
-<h1> Change:
-<p>Lamina: #{lamina}
-<input type="text" name="cantidad" value="#{cantidad}"><br>
-<a href=@{CantidadCambiadaR lamina cantidad}>Cambiar
+<h1> Change
+<form method=post enctype=#{enctype}>
+      ^{newChangeLaminaWidget}
+      <div>
+           <input type=submit value=Change>
