@@ -83,7 +83,7 @@ postExchangeR user1 user2 lamina = do
     ((res,exchangeWidget), enctype) <- runFormPost (exchangeForm user1 user2 lamina)
     case res of
         FormSuccess exchange -> do
-            runDB $ do
+            _ <- runDB $ do
                 let l2 = intercambioLamina2 exchange
                 let c = intercambioCantidad exchange
                 updateWhere [UserLaminaUser ==. user1, UserLaminaLamina ==. lamina] [UserLaminaCantidad -=. c]
@@ -101,6 +101,7 @@ postExchangeR user1 user2 lamina = do
                             updateWhere [UserLaminaUser ==. user2, UserLaminaLamina ==. lamina] [UserLaminaCantidad +=. c]
                             return $ toSqlKey 0
                 deleteWhere [UserLaminaCantidad <=. 0]
+                insert $ exchange
             redirect UserLaminaR
         _ -> defaultLayout $ do
             setMessageI $ MsgUnsuccessfulExchange
