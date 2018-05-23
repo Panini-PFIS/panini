@@ -56,10 +56,13 @@ exchangeForm :: UserId -> UserId -> Int -> Form Intercambio
 exchangeForm user1 user2 lamina2 = renderBootstrap3 BootstrapBasicForm $ Intercambio
         <$> pure user1
         <*> pure user2
-        <*> areq intField (bfs MsgLamina1) Nothing
+        <*> areq (radioField laminasopt) "Lamina" Nothing
         <*> pure lamina2
         <*> areq intField "Cantidad: " Nothing
         <*> lift (liftIO getCurrentTime)
+        where   laminasopt = do
+                    entities <- runDB $ selectList [UserLaminaUser ==. user1] [Asc UserLaminaLamina]
+                    optionsPairs $ map (\lamina -> (MsgLaminaOption $ userLaminaLamina $ entityVal $ lamina, userLaminaLamina $ entityVal lamina)) entities
 
 getExchangeR :: UserId -> UserId -> Int -> Handler Html
 getExchangeR user1 user2 lamina = do
@@ -80,7 +83,24 @@ postExchangeR user1 user2 lamina = do
     ((res,exchangeWidget), enctype) <- runFormPost (exchangeForm user1 user2 lamina)
     case res of
         FormSuccess exchange -> do
-            _ <- runDB $ insert exchange
+            runDB $ do
+                let l2 = intercambioLamina2 exchange
+                let c = intercambioCantidad exchange
+                updateWhere [UserLaminaUser ==. user1, UserLaminaLamina ==. lamina] [UserLaminaCantidad -=. c]
+                updateWhere [UserLaminaUser ==. user2, UserLaminaLamina ==. l2] [UserLaminaCantidad -=. c]
+                ans <- getBy $ UniqueUserLamina user1 l2
+                _ <- case ans of
+                    Nothing -> insert $ UserLamina user1 l2 c
+                    _ -> do
+                            updateWhere [UserLaminaUser ==. user1, UserLaminaLamina ==. l2] [UserLaminaCantidad +=. c]
+                            return $ toSqlKey 0
+                ans2 <- getBy $ UniqueUserLamina user1 l2
+                _ <- case ans2 of
+                    Nothing -> insert $ UserLamina user2 lamina c
+                    _ -> do
+                            updateWhere [UserLaminaUser ==. user2, UserLaminaLamina ==. lamina] [UserLaminaCantidad +=. c]
+                            return $ toSqlKey 0
+                deleteWhere [UserLaminaCantidad <=. 0]
             redirect UserLaminaR
         _ -> defaultLayout $ do
             setMessageI $ MsgUnsuccessfulExchange
