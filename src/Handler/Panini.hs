@@ -94,7 +94,7 @@ postExchangeR user1 user2 lamina = do
                     _ -> do
                             updateWhere [UserLaminaUser ==. user1, UserLaminaLamina ==. l2] [UserLaminaCantidad +=. c]
                             return $ toSqlKey 0
-                ans2 <- getBy $ UniqueUserLamina user1 l2
+                ans2 <- getBy $ UniqueUserLamina user2 lamina
                 _ <- case ans2 of
                     Nothing -> insert $ UserLamina user2 lamina c
                     _ -> do
